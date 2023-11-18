@@ -20,7 +20,7 @@ def bmp_to_matrix_array(path):
     width, height = img.size
     matrix = []
 
-    for y in range(height):  # Assuming each matrix is 18x24 pixels
+    for y in range(height):
         row = []
         for x in range(width):
             sub_img = img.crop((x, y, x+1, y+1))
@@ -92,8 +92,8 @@ def save_matrix_array(the_frames):
 images = int(input("enter the number of the frames you want to see: "))
 frame_rate = int(input("enter the frame rate you want to see: "))
 
-for i in range(0,  (images * frame_rate), frame_rate):
-    image_path = f"frames/resized/output_{i:04d}.bmp"
+for i in range(1,  (images * frame_rate), frame_rate):
+    image_path = f"frames/resized-mdm/output_{i:04d}.bmp"
     frames.append(bmp_to_matrix_array(image_path))
 
 # print_matrix_array(frames)
