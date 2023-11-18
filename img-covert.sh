@@ -4,6 +4,8 @@
 input_dir=""
 output_dir=""
 remove_original=false
+width=24
+height=18
 
 # Function to print usage
 print_usage() {
@@ -11,6 +13,8 @@ print_usage() {
   echo "Options:"
   echo "  -i <input_directory>    Input directory containing images"
   echo "  -o <output_directory>   Output directory for converted images"
+  echo "  -w                      Width of the output image in pixels (optional)"
+  echo "  -h                      Height of the output image in pixels (optional)"
   echo "  -r                      Remove original files after conversion (optional)"
   exit 1
 }
@@ -40,13 +44,19 @@ progress_bar() {
 }
 
 # Parse command line options
-while getopts ":i:o:r" opt; do
+while getopts ":i:o:w:h:r" opt; do
   case $opt in
     i)
       input_dir="$OPTARG"
       ;;
     o)
       output_dir="$OPTARG"
+      ;;
+    w)
+      width="$OPTARG"
+      ;;
+    h)
+      height="$OPTARG"
       ;;
     r)
       remove_original=true
@@ -91,7 +101,7 @@ for ((i = 0; i < total_files; i++)); do
   fi
 
   # Convert the image to black and white BMP and resize to 24x18 pixels
-  convert "$file" -colorspace Gray -resize 24x18 -depth 1 "$output_dir/$filename.bmp"
+  convert "$file" -colorspace Gray -resize "$width"x"$height" -depth 1 "$output_dir/$filename.bmp"
 
   # Optional: If you want to remove the original file after conversion
   if [ "$remove_original" = true ]; then
