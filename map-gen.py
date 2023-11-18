@@ -52,9 +52,38 @@ def print_matrix_array(the_frames):
                     print(f'     {"".join(row)}`,')
     print("]")
 
+def save_matrix_array(the_frames):
+    """
+    Saves the matrix array in a specific format to a text file.
 
-for i in range(image_start, image_start + (images * 2), 2):
+    Args:
+        the_frames (list): The matrix array to be saved.
+
+    Returns:
+        None
+    """
+    with open('map.js', 'w', encoding='utf-8') as f:
+        f.write("const max_level = " + str(len(the_frames) - 1) + "\n")
+        f.write("const levels = [\n")
+        for p, matrix in enumerate(the_frames):
+            if p != 0:
+                for n, row in enumerate(matrix):
+                    if n == 0:
+                        f.write(f'  map`{"".join(row)}\n')
+                    if n < len(matrix) - 1:
+                        f.write(f'     {"".join(row)}\n')
+                    else:
+                        f.write(f'     {"".join(row)}`,\n')
+        f.write("]")
+
+images = int(input("enter the number of the frames you want to see: "))
+
+for i in range(image_start, image_start + (images * 2), 8):
     image_path = f"frames/resized/output_{i:04d}.bmp"
     frames.append(bmp_to_matrix_array(image_path))
 
-print_matrix_array(frames)
+# print_matrix_array(frames)
+
+input("Press Enter to save the map to a text file...")
+save_matrix_array(frames)
+print("Done!")
