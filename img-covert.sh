@@ -15,21 +15,28 @@ print_usage() {
   exit 1
 }
 
-# Function to display a progress bar
+# Function to display a progress bar and calculate estimated time left
 progress_bar() {
-  local progress current total width filename
+  local progress current total width filename start_time elapsed_time remaining_time
 
   # Assign values to variables
   current=$1
   total=$2
   width=50
   filename=$3
+  start_time=$4
 
   # Calculate progress
   progress=$((current * 100 / total))
 
-  # Display the progress bar and file name
-  printf "[%-*s] %d%% - %s\r" "$width" "$(printf '=%.0s' $(seq 1 $((width * progress / 100))))" "$progress" "$filename"
+  # Calculate elapsed time
+  elapsed_time=$(($(date +%s) - start_time))
+
+  # Calculate remaining time (estimated)
+  remaining_time=$((elapsed_time * (total - current) / current))
+
+  # Display the progress bar, file name, and estimated time
+  printf "[%-*s] %d%% - %s - ETA: %02d:%02d\r" "$width" "$(printf '=%.0s' $(seq 1 $((width * progress / 100))))" "$progress" "$filename" "$((remaining_time / 60))" "$((remaining_time % 60))"
 }
 
 # Parse command line options
@@ -68,11 +75,20 @@ mkdir -p "$output_dir"
 file_list=($(find "$input_dir" -type f \( -iname \*.jpg -o -iname \*.jpeg -o -iname \*.png \)))
 total_files=${#file_list[@]}
 
+# Record start time
+start_time=$(date +%s)
+
 # Process each file
 for ((i = 0; i < total_files; i++)); do
   file="${file_list[i]}"
   # Get the file name without extension
   filename=$(basename "$file" | sed 's/\.[^\.]*$//')
+
+  # Check if the output file already exists; if yes, skip processing
+  if [ -e "$output_dir/$filename.bmp" ]; then
+    echo "Skipping $filename (already converted)"
+    continue
+  fi
 
   # Convert the image to black and white BMP and resize to 24x18 pixels
   convert "$file" -colorspace Gray -resize 24x18 -depth 1 "$output_dir/$filename.bmp"
@@ -82,8 +98,8 @@ for ((i = 0; i < total_files; i++)); do
     rm "$file"
   fi
 
-  # Display the progress bar with the file name
-  progress_bar "$((i + 1))" "$total_files" "$filename"
+  # Display the progress bar with the file name and estimated time
+  progress_bar "$((i + 1))" "$total_files" "$filename" "$start_time"
 done
 
 echo -e "\nConversion complete."
