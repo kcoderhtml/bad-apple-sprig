@@ -1,7 +1,7 @@
 from PIL import Image
 
-image_start = 2
 frames = []
+
 
 def bmp_to_matrix_array(path):
     """
@@ -11,7 +11,8 @@ def bmp_to_matrix_array(path):
         image_path (str): The path to the bitmap image file.
 
     Returns:
-        list: A matrix array representing the image, where each element is a string of 'b' (black) or '.' (white) pixels.
+        list: A matrix array representing the image, where each element
+        is a string of 'b' (black) or '.' (white) pixels.
     """
     img = Image.open(path)
     img = img.convert("1")  # Convert to black and white
@@ -23,10 +24,12 @@ def bmp_to_matrix_array(path):
         row = []
         for x in range(width):
             sub_img = img.crop((x, y, x+1, y+1))
-            row.append(''.join(['.' if pixel == 255 else 'b' for pixel in sub_img.getdata()]))
+            row.append(
+                ''.join(['.' if pixel == 255 else 'b' for pixel in sub_img.getdata()]))
         matrix.append(row)
 
     return matrix
+
 
 def print_matrix_array(the_frames):
     """
@@ -51,6 +54,7 @@ def print_matrix_array(the_frames):
                     print(f'     {"".join(row)}`,')
     print("]")
 
+
 def save_matrix_array(the_frames):
     """
     Saves the matrix array in a specific format to a text file.
@@ -63,9 +67,10 @@ def save_matrix_array(the_frames):
     """
     with open('map.js', 'w', encoding='utf-8') as f:
         f.write("const b=\"b\";setLegend([\"b\",bitmap`\n")
-        for i in range(15):
+        for _ in range(15):
             f.write("0000000000000000\n")
-        f.write("0000000000000000`]);let level=0;\n")
+        f.write("0000000000000000`]);let level=0;let framerate=" +
+                str((1000 / (25 / frame_rate)))+"\n")
 
         f.write("const max_level = " + str(len(the_frames) - 1) + "\n")
         f.write("const levels = [\n")
@@ -79,13 +84,15 @@ def save_matrix_array(the_frames):
                     else:
                         f.write(f'     {"".join(row)}`,\n')
         f.write("]\n")
-        f.write("setMap(levels[level]);var tick=setInterval(()=>{level<max_level&&(setMap(levels[level]),level++)},200);")
+        f.write(
+            "setMap(levels[level]);var tick=setInterval(()=>{level<max_level&&(setMap(levels[level]),level++)},framerate);")
         f.close()
+
 
 images = int(input("enter the number of the frames you want to see: "))
 frame_rate = int(input("enter the frame rate you want to see: "))
 
-for i in range(image_start, image_start + (images * frame_rate), frame_rate):
+for i in range(0,  (images * frame_rate), frame_rate):
     image_path = f"frames/resized/output_{i:04d}.bmp"
     frames.append(bmp_to_matrix_array(image_path))
 
