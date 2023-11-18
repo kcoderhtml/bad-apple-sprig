@@ -1,7 +1,6 @@
 from PIL import Image
 
 image_start = 2
-images = 500
 frames = []
 
 def bmp_to_matrix_array(path):
@@ -63,6 +62,11 @@ def save_matrix_array(the_frames):
         None
     """
     with open('map.js', 'w', encoding='utf-8') as f:
+        f.write("const b=\"b\";setLegend([\"b\",bitmap`\n")
+        for i in range(15):
+            f.write("0000000000000000\n")
+        f.write("0000000000000000`]);let level=0;\n")
+
         f.write("const max_level = " + str(len(the_frames) - 1) + "\n")
         f.write("const levels = [\n")
         for p, matrix in enumerate(the_frames):
@@ -74,11 +78,14 @@ def save_matrix_array(the_frames):
                         f.write(f'     {"".join(row)}\n')
                     else:
                         f.write(f'     {"".join(row)}`,\n')
-        f.write("]")
+        f.write("]\n")
+        f.write("setMap(levels[level]);var tick=setInterval(()=>{level<max_level&&(setMap(levels[level]),level++)},200);")
+        f.close()
 
 images = int(input("enter the number of the frames you want to see: "))
+frame_rate = int(input("enter the frame rate you want to see: "))
 
-for i in range(image_start, image_start + (images * 2), 8):
+for i in range(image_start, image_start + (images * frame_rate), frame_rate):
     image_path = f"frames/resized/output_{i:04d}.bmp"
     frames.append(bmp_to_matrix_array(image_path))
 
