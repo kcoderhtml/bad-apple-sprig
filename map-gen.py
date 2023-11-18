@@ -1,8 +1,8 @@
 from PIL import Image
 
-image_path = "frames/resized/output_0140.bmp"
-image_start = 140
-image_end = 149
+image_start = 2
+images = 500
+frames = []
 
 def bmp_to_matrix_array(path):
     """
@@ -29,25 +29,32 @@ def bmp_to_matrix_array(path):
 
     return matrix
 
-def print_matrix_array(matrix):
+def print_matrix_array(the_frames):
     """
-    Prints the matrix as a JavaScript array of strings.
+    Prints the matrix array in a specific format.
 
     Args:
-        matrix (list): The matrix to be printed.
+        the_frames (list): The matrix array to be printed.
 
     Returns:
         None
     """
+    print("const max_level = " + str(len(the_frames) - 1))
     print("const levels = [")
-    for i, row in enumerate(matrix):
-        if i == 0:
-            print(f'  map`{"".join(row)}')
-        if i < len(matrix) - 1:
-            print(f'     {"".join(row)}')
-        else:
-            print(f'     {"".join(row)}`,')
+    for p, matrix in enumerate(the_frames):
+        if p != 0:
+            for n, row in enumerate(matrix):
+                if n == 0:
+                    print(f'  map`{"".join(row)}')
+                if n < len(matrix) - 1:
+                    print(f'     {"".join(row)}')
+                else:
+                    print(f'     {"".join(row)}`,')
     print("]")
 
-matrix_array = bmp_to_matrix_array(image_path)
-print_matrix_array(matrix_array)
+
+for i in range(image_start, image_start + (images * 2), 2):
+    image_path = f"frames/resized/output_{i:04d}.bmp"
+    frames.append(bmp_to_matrix_array(image_path))
+
+print_matrix_array(frames)
